@@ -1,39 +1,30 @@
-Ansible tutorial
+Пособие по Vagrant
 ================
 
 # Inventory
 
-Before continuing, you need an inventory file. The default place for such a
-file is  `/etc/ansible/hosts`. However, you can configure ansible to look
-somewhere else, use an environment variable (`ANSIBLE_HOSTS`), or use the `-i`
-flag in ansible commands an provide the inventory path.
+Чтобы продолжить, нам нужно подготовить inventory-файл. Место по умолчанию это `/etc/ansible/hosts`. 
+Но вы можете настроить Ansible использовать другой путь, для этого используется переменная окружения (`ANSIBLE_HOSTS`) или флаг `-i`.
 
-We've created an inventory file for you in the directory that looks like this:
+Мы создали такой inventory-файл:
 
     host0.example.org ansible_ssh_host=192.168.33.10 ansible_ssh_user=root
     host1.example.org ansible_ssh_host=192.168.33.11 ansible_ssh_user=root
     host2.example.org ansible_ssh_host=192.168.33.12 ansible_ssh_user=root
 
-`ansible_ssh_host` is a special _variable_ that sets the IP ansible will use 
-when trying to connect to this host. It's not necessary here if you use the 
-vagrant-hostmaster gem. Also, you'll have to change the IPs if you have set 
-up your own virtual machines with different addresses.
+`ansible_ssh_host` это специальная _переменная_, которая содержит IP-адрес узла, к которому будет происходить соединение. В данном случае она не обязательна если вы используете gem vagrant-hostmaster. Также, вам нужно будет менять IP-адреса если вы устанавливали и настраивали свою виртуальную машину с другими адресами.
 
-`ansible_ssh_user` is another special _variable_ that tells ansible to
-connect as this user when using ssh. By default ansible would use your
-current username, or use another default provided in ~/.ansible.cfg
-(`remote_user`).
+`ansible_ssh_user` это еще одна специальная _переменная_ которая говорит Ansible'у подключаться под указанным аккаунтом (юзером). По умолчанию Ansible использует ваш текущий аккаунт, или другое значение по умолчанию, указанное в ~/.ansible.cfg (`remote_user`).
 
-# Testing
+# Проверка
 
-Now that ansible is installed, let's check everything works properly.
+Теперь когда Ansible установлен, давайте проверим что все работает:
 
     ansible -m ping all -i step-01/hosts
 
-What ansible will try to do here is just executing the `ping` module (more on
-modules later) on each host.
+Здесь Ansible попытается запустить модуль `ping` (подробнее о модулях позже) на каждом хосте
 
-The output should look like this:
+Вывод должен быть примерно таким:
 
     host0.example.org | success >> {
         "changed": false, 
@@ -50,7 +41,7 @@ The output should look like this:
         "ping": "pong"
     }
 
-Good! All 3 hosts are alive and kicking, and ansible can talk to them.
+Отлично! Все три хоста живы и здоровы, и Ansible может общаться с ними.
 
-Now head to next step in directory [step-02](https://github.com/leucos/ansible-tuto/tree/master/step-02).
+Теперь переходите к следующему шагу [step-02](https://github.com/leucos/ansible-tuto/tree/master/step-02).
 
