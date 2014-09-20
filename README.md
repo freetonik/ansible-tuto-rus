@@ -1,57 +1,40 @@
-Ansible tutorial
+Пособие по Ansible
 ================
 
-This tutorial presents ansible step-by-step. You'll need to have a (virtual or
-physical) machine to act as an ansible node. A vagrant environment is provided for 
-going through this tutorial.
+Это пособие познакомит вас Ansible пошагово. Вам понадобится (виртуальная или реальная) машина, которая будет выступать в роли ansible node. Окружение для Vagrant идет в комплекте с этим пособием.
 
-Ansible is a configuration management software that let's you control and
-configure nodes from  another machine. What makes it different from other
-management software is that ansible  uses (potentially existing) SSH
-infrastructure, while others (chef, puppet, ...) need a specific PKI
-infrastructure to be set-up.
+Ansible это программное решение для удаленного управления конфигурациями. Оно позволяет настраивать удаленные узлы. Главное его отличие от других подобных систем – Ansible использует (потенциально) существующую инфраструктуру SSH, в то время как другие (chef, puppet, ...) требует установки специального PKI-окружения.
 
-Ansible also emphasises push mode, where configuration is pushed from a master
-machine (a master machine is only a machine where you can SSH to nodes from) to
-nodes, while most other CM typically do it the other way around (nodes pull
-their config at times from a master machine).
+Ansible использует т.н. push mode: конфигурация "проталкивается" (push) с главной машины. Другие CM-системы обычно поступают наоборот – узлы "тянут" (pull) конфигурацию с главной машины.
 
-This mode is really interesting since you do not need to have a 'publicly'
-accessible 'master' to be able to configure remote nodes: it's the nodes
-that need to be accessible (we'll see later that 'hidden' nodes can pull their
-configuration too!), and most of the time they are.
+Этот режим интересен потому что вам не нужно иметь публично доступную главноую машину для удаленной настройки узлов: это узлы должны быть доступны (позже мы увидим что скрытые узлы также могут получать конфигурацию), и большую часть времени они на самом деле доступны.
 
-# Prerequisites for Ansible
+# Что нужно для Ansible
 
-You need the following python modules on your machine (the machine you run ansible 
-on) 
+Необходимы следующие Python-модули
 - python-yaml
 - python-jinja2
 
-On Debian/Ubuntu run:
+На Debian/Ubuntu запустите:
+
 ``sudo apt-get install python-yaml python-jinja2 python-paramiko python-crypto``
 
-We're also assuming you have a keypair in your ~/.ssh directory.
+У вас также должна быть комбинация ключей в ~/.ssh.
 
-# Installing Ansible
+# Установка Ansible
 
-## From source
+## Из исходников
 
-Ansible devel branch is always usable, so we'll run straight from a git checkout.
-You might need to install git for this (`sudo apt-get install git` on Debian/Ubuntu).
+Ветка devel всегда стабильна, так что используем ее. Возможно, вам нужно будет установить git (`sudo apt-get install git` на Debian/Ubuntu).
 
     git clone git://github.com/ansible/ansible.git
     cd ./ansible
 
-At this point, we can load the ansible environment:
+Теперь можно загрузить окружение Ansible.
 
     source ./hacking/env-setup
 
-## From a deb package
-
-When running from an installed package, this is absolutely not necessary. If
-you prefer running from a debian package ansible, provides a `make target` to
-build it. You need a few packages to build the deb:
+## Из deb пакета
 
     sudo apt-get install make fakeroot cdbs python-support
     git clone git://github.com/ansible/ansible.git
@@ -59,46 +42,39 @@ build it. You need a few packages to build the deb:
     make deb
     sudo dpkg -i ../ansible_1.1_all.deb (version may vary)
 
-We'll assume you're using the deb packages in the rest of this tutorial.
+В этом пособии мы допускаем, что вы использовали именно этот способ.
 
-# Cloning the tutorial
+# Клонирование пособия
 
-    git clone https://github.com/leucos/ansible-tuto.git
-    cd ansible-tuto
+    git clone https://github.com/freetonik/ansible-tuto-rus.git
+    cd ansible-tuto-rus
 
-# Using Vagrant with the tutorial
+# Использование Vagrant в пособии
 
-It's highly recommended to use Vagrant to follow this tutorial. If you don't have 
-it already, setting up should be quite easy and is described in [step-00/README.md](https://github.com/leucos/ansible-tuto/tree/master/step-00/README.md).
+Настоятельно рекомендуем использовать Vagrant при прохождении этого пособия. Если вы еще не установили его, следуйте простым инструкциям в [step-00/README.md](https://github.com/freetonik/ansible-tuto-rus/tree/master/step-00/README.md).
 
-If you wish to proceed without Vagrant (not recommended!), go straight to
-[step-01/README.md](https://github.com/leucos/ansible-tuto/tree/master/step-01).
+Если вы хотите продолжить без Vagnrant, переходите к шагу 
+[step-01/README.md](https://github.com/freetonik/ansible-tuto-rus/tree/master/step-01).
 
-## Contents
+## Содержание
 
-Just in case you want to skip to a specific step, here is a topic table of contents.
-
-- [00. Vagrant Setup](https://github.com/leucos/ansible-tuto/tree/master/step-00)
-- [01. Basic inventory](https://github.com/leucos/ansible-tuto/tree/master/step-01)
-- [02. First modules and facts](https://github.com/leucos/ansible-tuto/tree/master/step-02)
-- [03. Groups and variables](https://github.com/leucos/ansible-tuto/tree/master/step-03)
-- [04. Playbooks](https://github.com/leucos/ansible-tuto/tree/master/step-04)
-- [05. Playbooks, pushing files on nodes](https://github.com/leucos/ansible-tuto/tree/master/step-05)
-- [06. Playbooks and failures](https://github.com/leucos/ansible-tuto/tree/master/step-06)
-- [07. Playbook conditionals](https://github.com/leucos/ansible-tuto/tree/master/step-07)
-- [08. Git module](https://github.com/leucos/ansible-tuto/tree/master/step-08)
-- [09. Extending to several hosts](https://github.com/leucos/ansible-tuto/tree/master/step-09)
-- [10. Templates](https://github.com/leucos/ansible-tuto/tree/master/step-10)
-- [11. Variables again](https://github.com/leucos/ansible-tuto/tree/master/step-11)
-- [12. Migrating to roles](https://github.com/leucos/ansible-tuto/tree/master/step-12)
-- [13. Using tags (TBD)](https://github.com/leucos/ansible-tuto/tree/master/step-13)
-- [14. Roles dependencies (TBD)](https://github.com/leucos/ansible-tuto/tree/master/step-14)
-- [15. Debugging (TBD)](https://github.com/leucos/ansible-tuto/tree/master/step-15)
-- [99. The end](https://github.com/leucos/ansible-tuto/tree/master/step-99)
+- [00. Установка Vagrant](https://github.com/freetonik/ansible-tuto-rus/tree/master/step-00)
+- [01. Basic inventory](https://github.com/freetonik/ansible-tuto-rus/tree/master/step-01)
+- [02. Первые модули и факты](https://github.com/freetonik/ansible-tuto-rus/tree/master/step-02)
+- [03. Группы и переменные](https://github.com/freetonik/ansible-tuto-rus/tree/master/step-03)
+- [04. Playbooks](https://github.com/freetonik/ansible-tuto-rus/tree/master/step-04)
+- [05. Плейбуки, отправка файлов на узлы](https://github.com/freetonik/ansible-tuto-rus/tree/master/step-05)
+- [06. Плейбуки и ошибки](https://github.com/freetonik/ansible-tuto-rus/tree/master/step-06)
+- [07. Плейбуки и условия](https://github.com/freetonik/ansible-tuto-rus/tree/master/step-07)
+- [08. Модуль Git](https://github.com/freetonik/ansible-tuto-rus/tree/master/step-08)
+- [09. Расширение до нескольких хостов](https://github.com/freetonik/ansible-tuto-rus/tree/master/step-09)
+- [10. Шаблоны](https://github.com/freetonik/ansible-tuto-rus/tree/master/step-10)
+- [11. Снова переменные](https://github.com/freetonik/ansible-tuto-rus/tree/master/step-11)
+- [12. Миграция к ролям](https://github.com/freetonik/ansible-tuto-rus/tree/master/step-12)
 
 ## Contributing
 
-Thanks to all people who have contributed to this tutorial:
+Спасибо всем, кто участвовал в создании этого пособия:
 
 * Aladin Jaermann
 * Alexis Gallagher
@@ -119,30 +95,10 @@ Thanks to all people who have contributed to this tutorial:
 * Ruud Kamphuis
 * Victor Boivie
 
-I've been using Ansible almost since it's birth, but I learned a lot in
-the process of writing it. If you want to jump in, it's a great way to
-learn, feel free to add your contributions.
+Я использую Ansible почти с самого его появления, и я узнал очень много в процессе написания пособия. Если вы хотите поучаствовать – буду рад вашим дополнениям.
 
-The chapters being written live in the
-[writing](https://github.com/leucos/ansible-tuto/tree/writing) branch.
+## От переводчика
 
-If you have ideas on topics that would require a chapter, please open a
-PR.
+Это перевод [туториала](https://github.com/leucos/ansible-tuto) от Michel Blanc. Разделы, работа над которыми идет в данный момент, находятся в ветке [writing](https://github.com/leucos/ansible-tuto/tree/writing) в оригинальном репозитории.
 
-I'm also open on pairing for writing chapters. Drop me a note if you're
-interested.
-
-If you make changes or add chapters, please fill the `test/expectations`
-file and run the tests (`test/run.sh`).
-See the `test/run.sh` file for (a bit) more information.
-
-When adding a new chapter (e.g. `step-NN`), please issue:
-
-    cd step-99
-    ln -sf ../step-NN/{hosts,roles,site.yml,group_vars,host_vars} .
-
-For typos, grammar, etc... please send a PR for the master branch
-directly.
-
-Thank you!
-
+Если вы хотите дополнить/исправить перевод, пожалуйста, откройте Pull Request. 
