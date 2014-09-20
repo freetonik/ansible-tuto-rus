@@ -54,7 +54,7 @@ Ansible будет искать файлы по имени. Например, п
 
 Теперь когда мы познакомились с модулями, инвентаризацией и переменными, давайте, наконец, узнаем о настоящей силе Ansible с плейбуками.
 
-Переходите к [step-04](https://github.com/leucos/freetonik/ansible-tuto-rus/tree/master/step-04).
+Переходите к [step-04](https://github.com/freetonik/ansible-tuto-rus/tree/master/step-04).
 
 
 
