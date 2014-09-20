@@ -1,55 +1,45 @@
-Ansible tutorial
+Пособие по Vagrant
 ================
 
-Ansible playbooks
+Плейбуки Ansible
 -----------------
 
-Playbook concept is very simple: it's just a series of ansible commands
-(tasks), like the ones we used with the `ansible` CLI tool. These tasks are
-targeted at a specific set of hosts/groups.
+Концепция плейбуков очень проста: это просто набор Ansible-команд (задач, tasks), похожих на те, что мы выполняли с утилитой `ansible`. Эти задачи направлены на конкретные наборы узлов/групп.
 
-The necessary files for this step should have appeared magically and you don't even 
-have to type them.
+Необходиые для этого шага файлы должны были возникнуть магическим образом, так что вам не нужно ничего набирать.
 
-# Apache example (a.k.a. Ansible's "Hello World!")
+# Пример с Apache (a.k.a. "Hello World!" в Ansible')
 
-We assume we have the following inventory file (let's name it `hosts`):
+Продолжаем с допущением, что ваш inventory-файл выглядит так (назовем его `hosts`):
 
     [web]
     host1.example.org
 
-and all hosts are debian-like.
+и все хосты это системы на основе Debian.
 
-Note: remember you can (and in our exercise we do) use `ansible_ssh_host` to set
-the real IP of the host. You can also change the inventory and use a real hostname.
-In any case, use a non-critical machine to play with! In the real hosts
-file, we also have `ansible_ssh_user=root` to cope with potential
-different ansible default configurations.
+Заметка: помните, что вы можете (и в нашем упражнении мы делаем это) использовать `ansible_ssh_host` чтобы задать реальный IP-адрес хоста. Вы также можете изменять inventory и использовать реальный hostname. В любом случае, используйте машину, с которой безопасно экспериментировать. На реальных хостах мы также добавляем `ansible_ssh_user=root` чтобы избежать потенциальных проблем с разными конфигурациями по умолчанию.
 
-Lets build a playbook that will install apache on machines in the `web` group.
+Давайте соберем плейбук, который установит Apache на машины группы `web`.
 
     - hosts: web
       tasks:
         - name: Installs apache web server
           apt: pkg=apache2 state=installed update_cache=true
 
-We just need to say what we want to do using the right ansible modules. Here,
-we're using the [apt](http://ansible.cc/docs/modules.html#apt) module that
-can install debian packages. We also ask this module to update the package cache.
+Нам всего лишь нужно сказать что мы хотим сделать используя правильные модули Ansible. Здесь мы используем модуль [apt](http://ansible.cc/docs/modules.html#apt), который может устанавливать Debian-пакеты. Мы также просим этот подуль обновить кэш.
 
-We also added a name for this task. While this is not necessary, it's very
-informative when the playbook runs, so it's highly recommended.
+Нам нужно имя для этой задачи. Это не обязательно, но желательно для вашего же удобства.
 
-All in all, this was quite easy!
+Ну, в целом было довольно легко!
 
-You can run the playbook (lets call it `apache.yml`):
+Теперь можно запустить плейбук (назовем его `apache.yml`):
 
     ansible-playbook -i step-04/hosts -l host1.example.org step-04/apache.yml
 
-Here, `step-04/hosts` is the inventory file, `-l` limits the run only to `host1.example.org`
-and `apache.yml` is our playbook.
+Здесь `step-04/hosts` это inventory-файл, `-l` ограничивает запуск хостом `host1.example.org`,
+и `apache.yml` это наш плейбук.
 
-When you run the above command, you should see something like:
+При запуске команды будет вывод подобный этому:
 
     PLAY [web] ********************* 
 
@@ -62,39 +52,30 @@ When you run the above command, you should see something like:
     PLAY RECAP ********************* 
     host1.example.org              : ok=2    changed=1    unreachable=0    failed=0    
 
-Note: You might see a cow passing by if you have `cowsay` installed. You can get rid of 
-it with `export ANSIBLE_NOCOWS="1"` if you don't like it.
+Заметка: возможно, вы заметите корову, если у вас установлен `cowsay`. Если она вам не нравится, можно отключить ее так: `export ANSIBLE_NOCOWS="1"`.
 
-Let's analyse the output one line at a time.
+Давайте проанализируем вывод строчка за строчкой.
 
     PLAY [web] ********************* 
-
-Ansible tells us it's running the play on hosts `web`. A play is a suite of ansible 
-instructions related to a host. If we'd have another `-host: blah` line in our playbook, 
-it would show up too (but after the first play has completed).
+    
+Ansible говорит нам, что play выполняется в группе `web`. Play это набор инструкций Ansible, связанных с хостом. Если бы у нас был другой `-host: blah` в плейбуке, он бы тоже вывелось (но после того, как первый play завершен).
 
     GATHERING FACTS ********************* 
     ok: [host1.example.org]
 
-Remember when we used the `setup` module? Before each play, ansible runs it on necessary
-hosts to gather facts. If this is not required because you don't need any info from 
-the host, you can just add `gather_facts: no` below the host entry (same level as 
-`tasks:`).
+Помните, когда мы использовали модуль `setup`? Перед каждым play'ем Ansible запускает его на каждом хосте и собирает факты. Если этого не нужно делать потому что вам не нужна никакая информация о хосте, можно добавить `gather_facts: no` под строкой хоста (на том же уровне что `tasks:`).
 
     TASK: [Installs apache web server] ********************* 
     changed: [host1.example.org]
 
-Next, the real stuff: our (first and only) task is run, and because it says
-`changed`, we know that it changed something on `host1.example.org`.
+Теперь самое главное: наша первая и единственная задача запущена, и так как там сказано `changed`, мы знаем что она изменила что-то на хосте `host1.example.org`.
 
     PLAY RECAP ********************* 
     host1.example.org              : ok=2    changed=1    unreachable=0    failed=0 
 
-Finally, ansible outputs a recap of what happened: two tasks have been run 
-and one of them changed something on the host (our apache task, setup module doesn't 
-change anything).
+Наконец, Ansible выводит резюме того, что произошло: две задачи были выполнены и одна из них изменила что-то на хосте (это была наша задача apache; модуль setup ничего не меняяет).
 
-Now let's try to run it again and see what happens:
+Давайте запустим это еще раз и посмотрим, что произойдет:
 
     $ ansible-playbook -i step-04/hosts -l host1.example.org step-04/apache.yml
 
@@ -109,18 +90,6 @@ Now let's try to run it again and see what happens:
     PLAY RECAP ********************* 
     host1.example.org              : ok=2    changed=0    unreachable=0    failed=0    
 
-Now changed is '0'. This is absolutely normal and is one of the core feature of ansible: 
-the playbook will act only if there is something to do. It's called _idempotency_, 
-and means that you can run your playbook as many times as you want, you will always end 
-up in the same state (well, unless you do crazy things with the `shell` module of course, 
-but this is beyond ansible's control).
+Теперь changed равен '0'. Это совершенно нормально и является одной из главных особенностей Ansible: плейбук будет делать что-то только если есть что делать. Это называется _идемпотентностью_. Это значит что можно запускать плейбук сколько угодно раз, но в итоге мы будем иметь машину в одном и том же состоянии (ну, только если вы не будете делать безумных штук с модулем `shell`, но Ansible уже не сможет ничего поделать).
 
-# Refining things
-
-Sure our playbook can install apache server, but it could be a bit more
-complete. It could add a virtualhost, ensure apache is restarted. It could
-even deploy our web site from a git repository. Lets "[make it so][]"
-
-Head to next step in [step-05](https://github.com/leucos/ansible-tuto/tree/master/step-05).
-
-[make it so]: https://www.google.fr/search?q=Michael+DeHaan+%22make+it+so%22 "© Michael DeHaan"
+Переходите к следующему шагу [step-05](https://github.com/freetonik/ansible-tuto-rus/tree/master/step-05).
