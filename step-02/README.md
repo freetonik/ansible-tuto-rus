@@ -1,40 +1,35 @@
-Ansible tutorial
+Пособие по Vagrant
 ================
 
-Talking with nodes
+Общение с узлами
 ------------------
 
-Now we're good to go. Let's play with the command we saw in the previous chapter: 
-`ansible`. This command is the first one of three that ansible provides which interact 
-with nodes.
+Теперь мы готовы. Давайте поиграем с уже знакомой нам командой из прошлого раздела: `ansible`. Эта команда – одна из трех команд, которую Ansible использует для взаимодействия с узлами.
 
-# Doing something useful
+# Сделаем что-нибудь полезное
 
-In the previous command, `-m ping` means "use module _ping_". This module is
-one of many available with ansible. `ping` module is really simple, it doesn't need any arguments.
-Modules that take arguments pass them via `-a` switch. Let's see a few other modules.
+В прошлой команде `-m ping` означал "используй модуль _ping_". Это один из множества модулей, доступных в Ansible. Модуль `ping` очень прост, он не требует никаких аргументов. Модули, требующие аргументов, могут получить их через `-a`. Давайте взглянем на несколько модулей.
 
-## Shell module
+## Модуль shell
 
-This module lets you execute a shell command on the remote host:
+Этот модуль позволяет запускать shell-команды на удаленном узле:
 
     ansible -i step-02/hosts -m shell -a 'uname -a' host0.example.org
 
-Output should look like:
+Вывод должен быть вроде:
 
     host0.example.org | success | rc=0 >>
     Linux host0.example.org 3.2.0-23-generic-pae #36-Ubuntu SMP Tue Apr 10 22:19:09 UTC 2012 i686 i686 i386 GNU/Linux
 
-Easy!
+Легко!
 
-## Copy module
+## Модуль copy 
 
-No surprise, with this module you can copy a file from the controlling machine to 
-the node. Lets say we want to copy our `/etc/motd` to `/tmp` of our target node:
+Не удивительно, модуль copy позволяет копировать файл из управляющей машины на удаленный узел. Представим что нам нужно скопировать наш `/etc/motd` в `/tmp` узла:
 
     ansible -i step-02/hosts -m copy -a 'src=/etc/motd dest=/tmp/' host0.example.org
 
-Output should look similar to:
+Вывод:
 
     host0.example.org | success >> {
         "changed": true, 
@@ -48,26 +43,20 @@ Output should look similar to:
         "state": "file"
     }
 
-Ansible (more accurately _copy_ module executed on the node) replied back a bunch of 
-useful information in JSON format. We'll see how that can be used later.
+Ansible (точнее, модуль _copy_, запущенный на узле) ответил кучей полезной информации в формате JSON. Мы увидим как это можно будет использовать позже.
 
-We'll see other useful modules below. Ansible has a huge 
-[module list](http://docs.ansible.com/list_of_all_modules.html) that covers almost anything you
-can do on a system. If you can't find the right module, writing one is pretty
-easy (it doesn't even have to be Python, it just needs to speak JSON).
+У Ansible есть огромный
+[список модулей](http://docs.ansible.com/list_of_all_modules.html), который покрывает практически все, что можно делать в системе. Если вы не нашли подходящего модуля, написание своего модуля – довольно простая задача (и не обязательно использовать Python, нужно лишь разговаривать с помощью JSON).
 
-# Many hosts, same command
+# Много хостов, одна команда
 
-Ok, the above stuff is fun, but we have many nodes to manage. Let's try that on
-other hosts too.
+Ок, все что было выше – прикольно, но нам нужно управлять множеством хостов. Давайте попробуем.
 
-Lets say we want to get some facts about the node, and, for instance,
-know which Ubuntu version we have deployed on nodes, it's pretty easy:
+Допустим, мы хотим собрать факты про узел и, например, хотим узнать какая версия Ubuntu установлена на узлах. Это довольно легко:
 
     ansible -i step-02/hosts -m shell -a 'grep DISTRIB_RELEASE /etc/lsb-release' all
 
-`all` is a shortcut meaning 'all hosts found in inventory file'. It would
-return:
+`all` это синоним 'все хосты в inventory-файле'. Вывод будет примерно таким:
 
     host1.example.org | success | rc=0 >>
     DISTRIB_RELEASE=12.04
@@ -78,18 +67,15 @@ return:
     host0.example.org | success | rc=0 >>
     DISTRIB_RELEASE=12.04
 
-# Many more facts
+# Больше фактов
 
-That was easy. However, It would quickly become cumbersome if we
-wanted more information (ip addresses, RAM size, etc...). The solution
-comes from another really handy module (weirdly) called `setup`: it
-specializes in node's _facts_ gathering.
+Легко и просто. Однако, если нам нужно больше информации (IP-адреса, размеры ОЗУ, и пр.), такой подход может быстро оказаться неудобным. Решение – использовать модуль `setup`. Он специализируется на сборке _фактов_ с узлов.
 
-Try it out:
+Попробуйте:
 
     ansible -i step-02/hosts -m setup host0.example.org
 
-replies with lots of information:
+ответ:
 
     "ansible_facts": {
         "ansible_all_ipv4_addresses": [
@@ -107,11 +93,9 @@ replies with lots of information:
     "changed": false, 
     "verbose_override": true
 
-It's been truncated for brevity, but you can find many interesting bits in the returned 
-data. You may also filter returned keys, in case you're looking for something specific.
+Вывод был сокращен для простоты, но вы можете узнать много интересного из этой информации. Вы также можете фильтровать ключи если вас интересует что-то конкретное.
 
-For instance, let's say you want to know how much memory you have on all your hosts, 
-easy with `ansible -i step-02/hosts -m setup -a 'filter=ansible_memtotal_mb' all`:
+Например, вам нужно узнать сколько памяти доступно на всех хостах. Это легко, запустите `ansible -i step-02/hosts -m setup -a 'filter=ansible_memtotal_mb' all`:
 
     host2.example.org | success >> {
         "ansible_facts": {
@@ -137,23 +121,21 @@ easy with `ansible -i step-02/hosts -m setup -a 'filter=ansible_memtotal_mb' all
         "verbose_override": true
     }
 
-Notice that hosts replied in different order compared to the previous output. This 
-is because ansible parallelizes communications with hosts!
+Заметьте, что узлы ответили не в том порядке, в котором они отвечали выше. Ansible общается с хостами параллельно!
 
-BTW, when using the setup module, you can use `*` in the `filter=` expression.
-It will act like a shell glob.
+Кстати, при использовании модуля `setup` можно указывать `*` в выражении `filter=`. Как в shell.
 
-# Selecting hosts
+# Выбор хостов
 
-We saw that `all` means 'all hosts', but ansible provides a 
-[lot of other ways to select hosts](http://ansible.cc/docs/patterns.html#selecting-targets):
+Мы видели, что `all` означает 'все хосты', но в Ansible есть 
+[куча иных способов выбирать хосты](http://ansible.cc/docs/patterns.html#selecting-targets):
 
-- `host0.example.org:host1.example.org` would run on host0.example.org and
+- `host0.example.org:host1.example.org` будет запущен на host0.example.org и на
   host1.example.org
-- `host*.example.org` would run on all hosts starting with 'host' and ending with 
-'.example.org' (just like a shell glob too)
+- `host*.example.org` будет запущен на всех хостах, названия которых начинается с 'host' и заканчивается на 
+'.example.org' (тоже как в shell)
 
-There are other ways that involve groups, we'll see that in 
-[step-03](https://github.com/leucos/ansible-tuto/tree/master/step-03).
+Есть другие способы с использованием групп, о них мы узнаем в следующем шаге 
+[step-03](https://github.com/freetonik/ansible-tuto-rus/tree/master/step-03).
 
 
