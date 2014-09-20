@@ -1,20 +1,16 @@
-Ansible tutorial
+Пособие по Vagrant
 ================
 
-Refining apache setup
+Улучшаем набор apache
 ---------------------
 
-We've installed apache, now lets set up our virtualhost.
+Мы установили apache, давайте теперь настроим virtualhost.
 
-# Refining the playbook
+# Улучшение плейбука
 
-We need just one virtualhost on our server, but we want to replace the
-default one with something more specific.
-So we'll have to remove the current (presumably `default`) virtualhost, send our 
-virtualhost, activate it and restart apache.
+Нам нужен лишь один виртуальный хост на сервере, но мы хотим сменить дефолтный на что-то более конкретное. Поэтому нам придется удалить текущий virtualhost, отправить наш virtualhost, активировать его и перезапустить apache. 
 
-Let's create a directory called `files`, and add our virtualhost configuration
-for host1.example.org, which we'll call `awesome-app`:
+Давайте создадим директиорию под названием `files` и добавим нашу конфигурацию для host1.example.org, назовем ее `awesome-app`:
 
     <VirtualHost *:80>
       DocumentRoot /var/www/awesome-app
@@ -25,7 +21,7 @@ for host1.example.org, which we'll call `awesome-app`:
       TransferLog /var/log/apache2/access.log
     </VirtualHost>
 
-Now, a quick update to our apache playbook and we're set:
+Теперь небольшой обноление плейбука и все готово:
 
     - hosts: web
       tasks:
@@ -50,7 +46,7 @@ Now, a quick update to our apache playbook and we're set:
         - name: restart apache
           service: name=apache2 state=restarted
 
-Here we go:
+Поехали:
 
     $ ansible-playbook -i step-05/hosts -l host1.example.org step-05/apache.yml
 
@@ -80,8 +76,6 @@ Here we go:
     PLAY RECAP ********************* 
     host1.example.org              : ok=7    changed=5    unreachable=0    failed=0    
 
-Pretty cool! Well, thinking about it, we're getting ahead of ourselves here. Shouldn't 
-we check that the config is ok before restarting apache? This way we won't end up 
-interrupting the service if our configuration file is incorrect.
+Круто! Ну, если задуматсья, мы немного опережаем события. Не нужно ли проверить корректность конфигурации перед тем, как перезапускать apache? Чтобы не нарушать работоспособность сервиса в случае если конфигурация содержит ошибку.
 
-Lets do that in [step-06](https://github.com/leucos/ansible-tuto/tree/master/step-06).
+Давайте сделаем это в [step-06](https://github.com/freetonik/ansible-tuto-rus/tree/master/step-06).
