@@ -1,24 +1,16 @@
-Ansible tutorial
+Пособие по Vagrant
 ================
 
-Using conditionals
+Использование условий
 ------------------
 
-We've installed apache, pushed our virtualhost and restarted the server. But we want 
-to revert things to a stable state if something goes wrong.
+Мы установили Apache, добавили виртуальный хост и перезапустили сервер. Но мы хотим вернуться к рабочему состоянию если что-то пошло не так.
 
-# Reverting when things go wrong
+# Возврат при проблемах
 
-A word of warning: there's no magic here. The previous error was not ansible's fault. It's not a backup 
-system, and it can't rollback all things. It's your job to make sure your playbooks are safe. Ansible 
-just doesn't know how to revert the effects of `a2ensite awesome-app`.
+Здесь нет никакой магии. Прошлая ошибка – не вина Ansible. Это не бэкап-система и она не умеет отказывать все к прошлым состояниям. Безопасность плейбуков – ваша ответственность. Ansible просто не знает как отменить эффект `a2ensite awesome-app`.
 
-But if we care to do it, it's well within our reach.
-
-As said, when a task fails, processing stops... unless we accept failure (and
-we [should](http://www.aaronsw.com/weblog/geremiah)). This is what we'll do: continue 
-processing if there is a failure but only to revert what we've done.
-
+Как было сказано ранее, если задача не может исполнится – обработка останавливается... но мы можем принять ошибку (и нам [нужно это делать](http://www.aaronsw.com/weblog/geremiah)). Так мы и поступим: продолжим обработку в случае ошибки, но только чтобы вернуть все к рабочему состоянию.
 
     - hosts: web
       tasks:
@@ -61,11 +53,11 @@ processing if there is a failure but only to revert what we've done.
         - name: restart apache
           service: name=apache2 state=restarted
 
-The `register` keyword records output from the `apache2ctl configtest` command (exit 
-status, stdout, stderr, ...), and `when: result|failed` checks if the registered variable 
-(`result`) contains a failed status.
+Ключевое слово `register` записывает вывод команды `apache2ctl configtest` (exit 
+status, stdout, stderr, ...), и `when: result|failed` проверяет содержит ли переменная 
+(`result`) статус failed.
 
-Here we go:
+Поехали:
 
     $ ansible-playbook -i step-07/hosts -l host1.example.org step-07/apache.yml
 
@@ -106,7 +98,7 @@ Here we go:
     PLAY RECAP ********************* 
     host1.example.org              : ok=7    changed=4    unreachable=0    failed=1    
 
-Seemed to work as expected. Let's try to restart apache to see if it really worked:
+Кажется, все работает как нужно, Давайте попробуем перезапустить apache:
 
     $ ansible -i step-07/hosts -m service -a 'name=apache2 state=restarted' host1.example.org
     host1.example.org | success >> {
@@ -115,10 +107,6 @@ Seemed to work as expected. Let's try to restart apache to see if it really work
         "state": "started"
     }
 
-Ok, now our apache is safe from misconfiguration here.
+Теперь наш Apache защищен от ошибок конфигурации.
 
-While this sounds like a lot of work, it isn't. Remember you can use variables
-almost  everywhere, so it's easy to make this a general playbook for apache,
-and use it everywhere to deploy your virtualhosts. Write it once, use it
-everywhere. We'll do that in step 9 but for now, let's deploy our web site
-using git in [step-08](https://github.com/leucos/ansible-tuto/tree/master/step-08).
+Это может показаться большим объемом работы, но это не так. Помните, можно использовать переменные практически везде, так что можно использовать это как общий плейбук для apache в других случаях. Напишите один раз и используйте везде. Мы займемся этим в шаге 9, но пока давайте задеплоим сайт с помощью git в шаге [step-08](https://github.com/freetonik/ansible-tuto-rus/tree/master/step-08).
