@@ -1,20 +1,16 @@
-Ansible tutorial
+Пособие по Vagrant
 ================
 
-Restarting when config is correct
+Перезапуск в случае ошибки конфигурации
 ------------------------------
 
-We've installed apache, pushed our virtualhost and restarted the server.
-But what if we wanted the playbook to restart the server only if the config is correct?
-Let's do that.
+Мы установили apache, изменили virtualhot и перезапустили сервер. Но что если мы хотим перезапускать сервер только если конфигурация корректна? 
 
-# Bailing out when things go wrong
+# Откатываемся если есть проблемы
 
-Ansible has a nifty feature: it will stop all processing if something goes wrong. 
-We'll take advantage of this feature to stop our playbook if the config file is not 
-valid.
+Ansible содержит ловкую штуку: он остановит всю обработку если что-то пошло не так. Мы используем эту особенность чтобы остановить плейбук когда конфигурация не валидна.
 
-Let's change our `awesome-app` virtual host configuration file and break it:
+Давайте изменим файл конфигурации виртуального хоста `awesome-app` и сломаем его:
 
     <VirtualHost *:80>
       RocumentDoot /var/www/awesome-app
@@ -25,14 +21,9 @@ Let's change our `awesome-app` virtual host configuration file and break it:
       TransferLog /var/log/apache2/access.log
     </VirtualHost>
 
-As said, when a task fails, processing stops. So we'll ensure that the
-configuration is valid before restarting the server. We also start by adding
-our  virtualhost _before_ removing the default virtualhost, so a subsequent
-restart (possibly done directly on the server) won't break apache.
+Как я сказал, если задача не может исполнится, обработка останавливается. Так что нужно удостовериться в валидности конфигурации перед перезапуском сервереа. Мы также начнем с добавления виртуального хоста _до_ удаления дефолтного виртуального хоста, так что последующий перезапуск (возможно, сделанный напрямую на сервере) не сломает apache.
 
-Note that we should have done this in the first place. Since we ran our
-playbook already, the default virtualhost is already deactivated. Nevermind:
-this playbook might be used on other innocent hosts, so let's protect them.
+Нужно было сделать это в самом начале. Так как мы уже запускали этот плейбук, дефолтный виртуальный хост уже деактивирован. Не проблема: этот плейбук можно использовать на других невинных хостах, так что давайте защитим их.
 
     - hosts: web
       tasks:
@@ -61,7 +52,7 @@ this playbook might be used on other innocent hosts, so let's protect them.
         - name: restart apache
           service: name=apache2 state=restarted
 
-Here we go:
+Поехали:
 
     $ ansible-playbook -i step-06/hosts -l host1.example.org step-06/apache.yml
 
@@ -91,11 +82,8 @@ Here we go:
     PLAY RECAP ********************* 
     host1.example.org              : ok=4    changed=2    unreachable=0    failed=1    
 
-As you can see since `apache2ctl` returns with an exit code of 1 when it fails, ansible is 
-aware of it and stops processing. Great!
+Как вы заметили, `apache2ctl` возвращает код ошибки 1. Ansible видит это и останавливает работу. Отлично!
 
-Mmmh, not so great in fact... Our virtual host has been added anyway. Any subsequent 
-apache restart will complain about our config and bail out. So we need a way to catch 
-failures and revert back.
+Ммм, хотя нет, не отлично... Наш виртуальный хост все равно был добавлен. При любой последующей попытке перезапуска Apache будет ругаться на конфигурацию и выключаться. Так что нам нужен способ отлавливать ошибки и возвращаться к рабочему состоянию. 
 
-Let's do that in [step-07](https://github.com/leucos/ansible-tuto/tree/master/step-07).
+Давайте займемся этим в [step-07](https://github.com/freetonik/ansible-tuto-rus/tree/master/step-07).
