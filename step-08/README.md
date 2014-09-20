@@ -1,24 +1,18 @@
-Ansible tutorial
+Пособие по Vagrant
 ================
 
-Deploying our website from git
+Деплоим сайт с помощью Git
 ------------------------------
 
-We've installed apache, pushed our virtualhost and restarted the server safely.
-Now we'll use the git module to deploy our application.
+Мы установили Apache, добавили виртуальный хост и безопасно перезапустили сервер. Теперь давайте используем модуль git чтобы сделать деплой приложения.
 
-# The git module
+# Модуль git
 
-Well, this is a kind of break. Nothing necessarily new here. The `git` module is 
-just another module. But we'll try it out just for fun. And we'll be familiar with 
-it when it comes to `ansible-pull` later on.
+Ну, честно говоря, тут все будет просто, ничего нового. Модуль `git` это просто еще один модуль. Но давайте попробуем что-нибудь интересное. А позже это пригодится когда мы будем работать с `ansible-pull`.
 
-Our virtualhost is set, but we need a few changes to finish our deployment.
-First, we're deploying a PHP application. So we need to install the
-`libapache2-mod-php5` package. Second, we have to install `git` since the
-git module (used to clone our application's git repository) uses it.
+Виртуальный хост задан, но нам нужно внести пару изменений чтобы закончить деплой. Мы деплоим приложение на PHP, так что нужно установить пакет `libapache2-mod-php5`. Также нужно установить сам `git`, так как, очевидно, модуль git требует его наличия.
 
-We could do it like this:
+Можно сделать так:
 
         ...
         - name: Installs apache web server
@@ -31,9 +25,7 @@ We could do it like this:
           apt: pkg=git state=installed
         ...
 
-but Ansible provides a more readable way to write this. Ansible can loop over a series 
-of items, and use each item in an action like this:
-
+но в Ansible есть способ лучше. Он может проходить по набору элементов и использовать каждый в определенном действии, вот так:
 
     - hosts: web
       tasks:
@@ -87,7 +79,7 @@ of items, and use each item in an action like this:
           service: name=apache2 state=restarted
 
 
-Here we go:
+Поехали:
 
     $ ansible-playbook -i step-08/hosts -l host1.example.org step-08/apache.yml
 
@@ -135,14 +127,9 @@ Here we go:
     PLAY RECAP ********************* 
     host1.example.org              : ok=10   changed=8    unreachable=0    failed=0    
 
-You can now browse to http://192.168.33.11, and it should display a
-kitten, and the server hostname.
+Теперь можно перейти на [http://192.168.33.11](http://192.168.33.11) и увидеть котенка и имя сервера.
 
-Note the `tags: deploy` line allows you to execute just a part of the playbook. 
-Let's say you push a new version for your site. You want to speed up and execute 
-only the part that takes care of deployment. Tags allows you to do it.
-Of course, "deploy" is just a string, it doesn't have any specific
-meaning and can be anything. Let's see how to use it:
+Строка `tags: deploy позволяет запустить определнную порцию плейбука. Допустим, вы запушили новую версию сайта. Вы хотите ускорить и запустить только ту часть, которая ответственна за деплой. Это можно сделать с помощью тегов. Конечно, "deploy" это просто строка, можно задавать любую. Давайте посмотрим как это можно использовать:
 
     $ ansible-playbook -i step-08/hosts -l host1.example.org step-08/apache.yml -t deploy 
     X11 forwarding request failed on channel 0
@@ -158,4 +145,4 @@ meaning and can be anything. Let's see how to use it:
     PLAY RECAP ********************* 
     host1.example.org              : ok=2    changed=1    unreachable=0    failed=0    
 
-Ok, let's deploy another web server in [step-09](https://github.com/leucos/ansible-tuto/tree/master/step-09).
+Ок, давайте задеплоим другой веб-сервер в шаге [step-09](https://github.com/freetonik/ansible-tuto-rus/tree/master/step-09).
