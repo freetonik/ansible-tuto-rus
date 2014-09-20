@@ -1,26 +1,22 @@
-Ansible tutorial
+Пособие по Vagrant
 ================
 
-Grouping hosts
+Группировка хостов
 --------------
 
-Hosts in inventory can be grouped arbitrarily. For instance, you could have a `debian` 
-group, a `web-servers` group, a `production` group, etc...
+Хосты в inventory можно группировать. Например, можно создать группу `debian`, группу `web-servers`, группу `production` и так далее.
 
     [debian]
     host0.example.org
     host1.example.org
     host2.example.org
 
-This can even be expressed shorter:
+Можно даже сократить:
 
     [debian]
     host[0-2].example.org
 
-If you wish to use child groups, just define a `[groupname:children]` and add child 
-groups in it.
-For instance, let's say we have various flavors of linux running, we could organize 
-our inventory like this:
+Если хотите задавать дочерние группы, используйте `[groupname:children]` и добавьте дочерние группы в него. Например, у нас есть разные дистрибутивы Линукса, их можно организовать следующим образом:
 
     [ubuntu]
     host0.example.org
@@ -32,44 +28,33 @@ our inventory like this:
     ubuntu
     debian
 
-Grouping of course, leverages configuration mutualization.
-
-Setting variables
+Установка переменных
 -----------------
 
-You can assign variables to hosts in several places: inventory file, host vars
-files, group vars files, etc...
+Вы можете добавлять переменные для хостов в нескольких местах: в inventory-файле, файлах переменных хостов, файлах переменных групп и др.
 
-I usually set most of my variables in group/host vars files (more on that later). 
-However, I often use some variables directly in the inventory file, such as `ansible_ssh_host` 
-which sets the IP address for the host. Ansible by default resolves hosts' name 
-when it attempts to connect via SSH. But when you're bootstrapping a host, it might 
-not have its definitive ip address yet. `ansible_ssh_host` comes in handy here.
+Обычно я задаю все переменные в файлах переменных групп/хостов (подробнее об этом позже). Однако, зачастую я использую переменные напрямую в inventory-файле, например, `ansible_ssh_host`, которая задает IP-адрес хоста. По умолчанию Ansible резолвит имена хостов при соединении по SSH. Но когда вы инициализируете хост, он, возможно, еще не имеет IP-адреса. `ansible_ssh_host` будет полезен в таком случае.
 
-When using `ansible-playbook` command (not the regular `ansible` command), variables
-can also be set with `--extra-vars` (or `-e`) command line switch.
-`ansible-playbook` command will be covered in the next step.
+При использовании команды `ansible-playbook` (не обычной команды `ansible`), переменные можно задавать с помощью флага `--extra-vars` (или `-e`). О команде `ansible-playbook` мы поговорим в следующем шаге.
 
-`ansible_ssh_port`, as you can guess, has the same function regarding the ssh port ansible 
-will try to connect at.
+`ansible_ssh_port`, как вы могли догадаться, используется чтобы задать порт соединения по SSH.
 
     [ubuntu]
     host0.example.org ansible_ssh_host=192.168.0.12 ansible_ssh_port=2222
 
-Ansible will look for additional variables definitions in group and host variable 
-files. These files will be searched in directories `group_vars` and `host_vars`, 
-below the directory where the main inventory file is located.
+Ansible ищет дополнительные переменные в файлах переменных групп и хостов. Он будет искать эти файлы в директориях `group_vars` и `host_vars`, внутри директории где расположен главный inventory-файл.
 
-The files will be searched by name. For instance, using the previously mentioned inventory file,
-`host0.example.org` variables will be searched in those files:
+Ansible будет искать файлы по имени. Например, при использовании упомянутого ранее inventory-файла, Ansible будет искать переменные `host0.example.org` в файлах:
 
 - `group_vars/linux`
 - `group_vars/ubuntu`
 - `host_vars/host0.example.org`
 
-It doesn't matter if those files do not exist, but if they do, ansible will use them.
+Если этих файлов не существует – ничего не произойдет, но если они существуют – они будут использованы.
 
-Now that we know the basics of modules, inventories and variables, let's
-explore the real power of Ansible with playbooks.
+Теперь когда мы познакомились с модулями, инвентаризацией и переменными, давайте, наконец, узнаем о настоящей силе Ansible с плейбуками.
 
-Head to [step-04](https://github.com/leucos/ansible-tuto/tree/master/step-04).
+Переходите к [step-04](https://github.com/leucos/freetonik/ansible-tuto-rus/tree/master/step-04).
+
+
+
