@@ -1,45 +1,34 @@
-Ansible tutorial
+Пособие по tutorial
 ================
 
-To make the tutorial self-contained, a Vagrant file is provided. Vagrant makes
-it easy to bootstrap barebones virtual machines with VirtualBox.
+Vagrant позволяет с легкостью создавать виртуальные машины и запускать их на VirtualBox. Vagrantfile идет в комплекте с пособием. 
 
-# Installing Vagrant
+# Установка Vagrant
 
-In order to run Vagrant, you need:
+Чтобы запустить Vagrant вам нужно установить:
 
-- VirtualBox installed
-- Ruby installed (should be on your system already)
-- Vagrant 1.1+ installed (see
+- VirtualBox
+- Ruby (скорее всего уже установлено на вашей системе)
+- Vagrant 1.1+ (см.
   http://docs.vagrantup.com/v2/installation/index.html).
-
-This should be all it takes to set up Vagrant.
-
-Now bootstrap your virtual machines with the following command. Note that you do not need to download any "box" manually. This tutorial already includes a `Vagrantfile` to get you up and running, and will get one for you if needed.
+  
+Теперь инициализируйте виртуальную машину с помощью следующей команды. Имейте ввиду, что вам не нужно скачивать какой-либо "box" вручную. Это пособие уже содержит готовый `Vagrantfile`, он содержит все, что нужно для работы.
 
 `vagrant up`
 
-and go grab yourself a coffee (note that if you use vagrant-hostmaster, you'll need 
-to type your password since it needs to sudo as root).
+и налейте себе кофе (если вы используете vagrant-hostmaster, то вам нужно будет ввести root-пароль). Если что-то пошло не так, загляните в [туториал по Vagrant'у](http://docs.vagrantup.com/v2/getting-started/index.html).
 
-If something goes wrong, refer to Vagrant's [Getting Started
-Guide](http://docs.vagrantup.com/v2/getting-started/index.html).
+# Добавление SSH-ключей на виртуальной машине
 
-# Adding your SSH keys on the virtual machines
+Чтобы продолжить, вам нужно добавить свои ключи в `authorized_keys` root'а на виртуальной машине. Это не обязательно (Ansible может использовать sudo, авторизацию по паролю и т.д.), но так будет намного проще.
 
-To follow this tutorial, you'll need to have your keys in VMs root's `authorized_keys`. 
-While this is not absolutely necessary (Ansible can use sudo, password authentication, 
-etc...), it will make things way easier.
-
-Ansible is perfect for this and we will use it for the job. However I won't
-explain what's happening for now. Just trust me.
+Ansible идеально подходит для этой задачи, поэтому используем его. Однако, я не буду пока ничего объяснять. Просто доверьтесь мне.
 
     ansible-playbook -c paramiko -i step-00/hosts step-00/setup.yml --ask-pass --sudo
 
-When asked for password, enter _vagrant_. If you get "Connections refused" errors, please check the firewall settings of your machine.
+В качестве пароля введите _vagrant_. Если возникнут ошибки "Connections refused", пожалуйста, проверьте настройки файрволла.
 
-To polish things up, it's better to have an ssh-agent running, and add your keys 
-to it (`ssh-add`).
+Теперь добавьте свои ключи в ssh-agent (`ssh-add`). 
 
-Now head to the first step in [step-01](https://github.com/leucos/ansible-tuto/tree/master/step-01).
+Теперь переходите к первому шагу [step-01](https://github.com/freetonik/ansible-tuto-rus/tree/master/step-01).
 
