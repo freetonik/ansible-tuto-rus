@@ -43,5 +43,5 @@
 
 Отлично! Все три хоста живы и здоровы, и Ansible может общаться с ними.
 
-Теперь переходите к следующему шагу [step-02](https://github.com/leucos/ansible-tuto/tree/master/step-02).
+Теперь переходите к следующему шагу [step-02](https://github.com/freetonik/ansible-tuto-rus/tree/master/step-02).
 
