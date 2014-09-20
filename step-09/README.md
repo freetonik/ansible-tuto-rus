@@ -1,15 +1,14 @@
-Ansible tutorial
+Пособие по Vagrant
 ================
 
-Adding another Webserver
+Добавляем еще один веб-сервер
 -------------------------
 
-We have one web server. Now we want two.
+У нас есть один веб-сервер. Мы хотим два.
 
-# Updating the inventory
+# Обновление inventory
 
-Since we have big expectations, we'll add another web server and a load
-balancer we'll configure in the next step. But let's complete the inventory now.
+Мы ожидаем наплыва трафика, так что давайте добавим еще один веб-сервер и балансировщик, который мы настроем в следующем шаге. Давайте закончим с inventory:
 
     [web]
     host1.example.org ansible_ssh_host=192.168.33.11 ansible_ssh_user=root
@@ -18,15 +17,11 @@ balancer we'll configure in the next step. But let's complete the inventory now.
     [haproxy]
     host0.example.org ansible_ssh_host=192.168.33.10 ansible_ssh_user=root
 
-Remember we're specifying `ansible_ssh_host` here because the host has a
-different IP than expected (or can't be resolved). You could add these hosts
-in your `/etc/hosts` and not have to worry, or use real host names (which is
-what you would do in a classic situation).
+Помните, здесь мы указываем `ansible_ssh_host` потому что хост имеет не тот IP что ожидается. Можно добавить эти хосты к себе в `/etc/hosts` или использовать реальные имена (что вы и будете делать в обычной ситуации).
 
-# Building another web server
+# Сборка другого веб-сервера
 
-We didn't do all this work for nothing. Deploying another web server is dead 
-simple:
+Деплой второго сервера очень прост:
 
     $ ansible-playbook -i step-09/hosts step-09/apache.yml
 
@@ -88,13 +83,8 @@ simple:
     host1.example.org              : ok=10   changed=5    unreachable=0    failed=0    
     host2.example.org              : ok=10   changed=8    unreachable=0    failed=0    
 
-All we had to do was remove `-l host1.example.org` from our command line. Remember 
-`-l` is a switch that limits the playbook run on specific hosts. Now that we don't 
-limit anymore, it will run on all hosts where the playbook is intended to run on 
-(i.e. `web`).
+Все что нужно это удалить `-l host1.example.org` из командной строки. Помните, `-l` позволяет ограничить хосты для запуска. Теперь ограничения не требуется и запуск произойдет на всех машинах группы `web`.
 
-If we had other servers in group `web` but wanted to limit the playbook to a subset, 
-we could have used, for instance: `-l firsthost:secondhost:...`.
+Если бы в группе `web` были бы другие машины, и нам нужно было бы запустить плейбук только на некоторых из них, можно было бы использовать, например, такое: `-l firsthost:secondhost:...`.
 
-Now that we have this nice farm of web servers, let's turn it into a cluster by 
-putting a load balancer in front of them in [step-10](https://github.com/leucos/ansible-tuto/tree/master/step-10).
+Теперь у нас есть эта милая ферма веб-серверов, давайте превратим ее в кластер с помощью балансировщика нагрузок в шаге [step-10](https://github.com/leucos/ansible-tuto/tree/master/step-10).
